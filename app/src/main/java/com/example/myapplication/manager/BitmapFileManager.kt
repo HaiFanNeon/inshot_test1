@@ -14,18 +14,17 @@ import android.util.Log
 import com.example.myapplication.`interface`.Coordinates
 import com.example.myapplication.model.DrawingModel
 import com.example.myapplication.strategy.BitmapExportStrategy
+import com.example.myapplication.strategy.BitmapLoaderStrategy
 import com.example.myapplication.strategy.BitmapSaveStrategy
 import com.example.myapplication.strategy.FileDraftStrategy
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
+
 
 class BitmapFileManager(
     private val saveStrategy: BitmapSaveStrategy,
-    private val loadStrategy: FileDraftStrategy,
+    private val loadStrategy: BitmapLoaderStrategy,
     private val exportStrategy: BitmapExportStrategy
     ) {
     suspend fun saveDraft(bitmap: Bitmap, matrix: FloatArray): Result<Unit> = withContext(Dispatchers.IO) {
