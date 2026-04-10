@@ -1,42 +1,26 @@
 package com.example.myapplication
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.Matrix
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.myapplication.config.DrawingViewModelFactory
 import com.example.myapplication.enum.DrawingTool
-import com.example.myapplication.ext.copyFrom
 import com.example.myapplication.manager.BitmapFileManager
-import com.example.myapplication.model.DrawingModel
-import com.example.myapplication.strategy.BitmapRoomStrategy
-import com.example.myapplication.strategy.BitmapSaveStrategy
-import com.example.myapplication.strategy.FileDraftStrategy
-import com.example.myapplication.strategy.MediaBitmapExportStrategy
+import com.example.myapplication.strategy.bitmap.BitmapRoomStrategy
+import com.example.myapplication.strategy.bitmap.FileDraftStrategy
+import com.example.myapplication.strategy.bitmap.MediaBitmapExportStrategy
 import com.example.myapplication.view.DrawingView
 import com.example.myapplication.viewModel.DrawingViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.observeOn
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
-import kotlin.text.set
 
 
 class MainActivity : ComponentActivity(), View.OnClickListener{

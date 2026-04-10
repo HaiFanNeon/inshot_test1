@@ -1,23 +1,9 @@
 package com.example.myapplication.manager
 
-import android.content.ContentValues
-import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Matrix
-import android.os.Build
-import android.provider.MediaStore
-import android.util.JsonReader
-import android.util.Log
-import com.example.myapplication.`interface`.Coordinates
-import com.example.myapplication.model.DrawingModel
-import com.example.myapplication.strategy.BitmapExportStrategy
-import com.example.myapplication.strategy.BitmapLoaderStrategy
-import com.example.myapplication.strategy.BitmapSaveStrategy
-import com.example.myapplication.strategy.FileDraftStrategy
-import com.google.gson.Gson
+import com.example.myapplication.strategy.bitmap.BitmapExportStrategy
+import com.example.myapplication.strategy.bitmap.BitmapLoaderStrategy
+import com.example.myapplication.strategy.bitmap.BitmapSaveStrategy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

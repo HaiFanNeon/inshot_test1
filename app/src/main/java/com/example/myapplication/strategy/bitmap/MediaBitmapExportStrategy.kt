@@ -1,4 +1,4 @@
-package com.example.myapplication.strategy
+package com.example.myapplication.strategy.bitmap
 
 import android.content.ContentValues
 import android.content.Context
@@ -6,9 +6,11 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class MediaBitmapExportStrategy(
     private val context: Context
@@ -29,10 +31,10 @@ class MediaBitmapExportStrategy(
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/draw")
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             } else {
-                val path = android.os.Environment.getExternalStoragePublicDirectory(
-                    android.os.Environment.DIRECTORY_PICTURES
+                val path = Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_PICTURES
                 ).absolutePath + "draw"
-                java.io.File(path).mkdirs()
+                File(path).mkdirs()
                 put(MediaStore.Images.Media.DATA, "${path}/${filename}")
             }
         }
