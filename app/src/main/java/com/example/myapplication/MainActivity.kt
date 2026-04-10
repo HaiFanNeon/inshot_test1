@@ -21,10 +21,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.myapplication.config.DrawingViewModelFactory
 import com.example.myapplication.enum.DrawingTool
-import com.example.myapplication.enum.ReviewMode
 import com.example.myapplication.ext.copyFrom
 import com.example.myapplication.manager.BitmapFileManager
 import com.example.myapplication.model.DrawingModel
+import com.example.myapplication.strategy.BitmapRoomStrategy
+import com.example.myapplication.strategy.BitmapSaveStrategy
+import com.example.myapplication.strategy.FileDraftStrategy
+import com.example.myapplication.strategy.MediaBitmapExportStrategy
 import com.example.myapplication.view.DrawingView
 import com.example.myapplication.viewModel.DrawingViewModel
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +44,7 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
     private lateinit var drawingView: DrawingView
     private lateinit var bitmapFileManager: BitmapFileManager
     private val viewModel: DrawingViewModel by viewModels {
-        DrawingViewModelFactory(BitmapFileManager(this))
+        DrawingViewModelFactory(bitmapFileManager)
     }
 
     private lateinit var btnBrush: Button
@@ -57,7 +60,11 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         drawingView = findViewById<DrawingView>(R.id.drawingView)
-        bitmapFileManager = BitmapFileManager(this)
+        bitmapFileManager = BitmapFileManager(
+            saveStrategy = BitmapRoomStrategy(this),
+            loadStrategy = FileDraftStrategy(this),
+            exportStrategy = MediaBitmapExportStrategy(this),
+        )
         loadDraw()
         drawingView.onSaveBitmapListener = {
             save()
@@ -124,9 +131,7 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
                         state.eraseSize
                     )
 
-                    drawingView.setMode(state.reviewMode)
-
-                    val isReview = state.reviewMode == ReviewMode.REVIEW
+                    val isReview = state.drawingTool == DrawingTool.REVIEW
 
                     btnPreview.isSelected = isReview
                     btnBrush.isSelected =
@@ -167,7 +172,7 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
                 viewModel.exportBitmap(drawingView.getBitmap())
             }
             R.id.btnPreview -> {
-                viewModel.setReviewMode()
+                viewModel.setDrawingTool(DrawingTool.REVIEW)
             }
             R.id.btnColorBlack -> {
                 viewModel.setBrushColor(Color.BLACK)

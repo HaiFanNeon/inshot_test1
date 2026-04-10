@@ -3,16 +3,9 @@ package com.example.myapplication.model
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import androidx.compose.ui.graphics.drawscope.Stroke
-import com.example.myapplication.`interface`.Coordinates
 import com.example.myapplication.enum.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 
 data class DrawingUiState(
-    val reviewMode: ReviewMode = ReviewMode.NONE,
     val drawingTool: DrawingTool = DrawingTool.NONE,
     val color: Int = Color.BLACK,
     val brushSize: Float = 8f,
@@ -26,10 +19,9 @@ class DrawingModel {
      * stroke：线的宽度
      * drawPath：保存这条线
      */
-    data class DrawingPath(
+    data class Stroke(
         val drawPath: Path = Path(),
-        var color: Int = 0,
-        var stroke: Float = 8f
+        val paint: Paint = Paint()
     )
 
     /**
@@ -40,8 +32,8 @@ class DrawingModel {
      */
     data class PathData(
         var curPath: Path = Path(),
-        val undoStk: ArrayDeque<DrawingPath> = ArrayDeque(),
-        val redoStk: ArrayDeque<DrawingPath> = ArrayDeque(),
+        val undoStk: ArrayDeque<Stroke> = ArrayDeque(),
+        val redoStk: ArrayDeque<Stroke> = ArrayDeque(),
         var drawingTool: DrawingTool = DrawingTool.NONE
     )
 }

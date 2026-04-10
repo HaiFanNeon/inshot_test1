@@ -24,16 +24,12 @@ import android.view.MotionEvent
 import android.view.View
 
 import androidx.annotation.RequiresApi
-
 import androidx.core.graphics.createBitmap
 import com.example.myapplication.enum.*
 import com.example.myapplication.ext.clear
 import com.example.myapplication.ext.copyFrom
 import com.example.myapplication.`interface`.Coordinates
-import com.example.myapplication.`interface`.DrawingInterface
 import com.example.myapplication.model.DrawingModel.*
-
-
 
 class DrawingView @JvmOverloads constructor(
     context: Context,
@@ -42,10 +38,6 @@ class DrawingView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     val pathData = PathData()
-    var reviewMode = ReviewMode.NONE
-
-    var touchType: TouchType = TouchType.NONE
-        private set
     private lateinit var bitmap: Bitmap
     private lateinit var bitmapCanvas: Canvas
     val transformMatrix = Matrix()
@@ -103,7 +95,7 @@ class DrawingView @JvmOverloads constructor(
         val x: Float = event.x
         val y: Float = event.y
 
-        val isReviewMode = getModel() == ReviewMode.REVIEW
+        val isReviewMode = getModel() == DrawingTool.REVIEW
 
         return if (isReviewMode) {
             reviewTouchEvent(event, x, y)
@@ -157,8 +149,8 @@ class DrawingView @JvmOverloads constructor(
         invalidate()
     }
 
-    private fun getModel(): ReviewMode {
-        return reviewMode
+    private fun getModel(): DrawingTool {
+        return pathData.drawingTool
     }
 
     fun updateConfig(tool: DrawingTool, color: Int, stroke: Float, eraseSize: Float) {
@@ -168,11 +160,6 @@ class DrawingView @JvmOverloads constructor(
         erasePaint.strokeWidth = eraseSize
         invalidate()
     }
-
-    fun setMode(mode: ReviewMode) {
-        reviewMode = mode
-    }
-
 
     private fun undo() : Boolean {
         return true
@@ -192,7 +179,7 @@ class DrawingView @JvmOverloads constructor(
     }
 
     private fun extBitmap(x: Float, y:Float) {
-        var limit = 100f
+        val limit = 100f
 
         if (x in 0f..(bitmap.width.toFloat() - limit) && y in 0f..(bitmap.height.toFloat() - limit)) return
 

@@ -9,7 +9,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.enum.DrawingTool
-import com.example.myapplication.enum.ReviewMode
 import com.example.myapplication.manager.BitmapFileManager
 import com.example.myapplication.model.DrawingUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,17 +22,9 @@ class DrawingViewModel(private val bitmapFileManager: BitmapFileManager ): ViewM
     private val _uiState = MutableStateFlow(DrawingUiState())
     val uiState: StateFlow<DrawingUiState> = _uiState.asStateFlow()
 
-    fun setReviewMode(mode: ReviewMode = ReviewMode.REVIEW) {
-        _uiState.update {
-            it.copy(reviewMode = mode)
-        }
-    }
-
     fun setDrawingTool(tool: DrawingTool) {
         _uiState.update {
-            it.copy(drawingTool = tool,
-                reviewMode = ReviewMode.NONE
-            )
+            it.copy(drawingTool = tool)
         }
     }
 
