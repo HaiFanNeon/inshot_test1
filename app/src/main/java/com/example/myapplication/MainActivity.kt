@@ -3,9 +3,9 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
+
 import android.widget.SeekBar
-import android.widget.TextView
+
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -13,76 +13,59 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.myapplication.config.DrawingViewModelFactory
+import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.myapplication.enum.DrawingTool
 import com.example.myapplication.manager.BitmapFileManager
 import com.example.myapplication.`interface`.impl.bitmap.BitmapRoomImpl
 import com.example.myapplication.`interface`.impl.bitmap.FileDraftImpl
 import com.example.myapplication.`interface`.impl.bitmap.MediaBitmapExportImpl
-import com.example.myapplication.view.DrawingView
+
 import com.example.myapplication.viewModel.DrawingViewModel
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity(), View.OnClickListener{
-
-    private lateinit var drawingView: DrawingView
-    private lateinit var bitmapFileManager: BitmapFileManager
+    private var bitmapFileManager: BitmapFileManager = BitmapFileManager(
+        saveStrategy = BitmapRoomImpl(this),
+        loadStrategy = FileDraftImpl(this),
+        exportStrategy = MediaBitmapExportImpl(this),
+    )
     private val viewModel: DrawingViewModel by viewModels {
         DrawingViewModelFactory(bitmapFileManager)
     }
 
-    private lateinit var btnBrush: Button
-    private lateinit var btnErase: Button
-    private lateinit var btnPreview: Button
-    private lateinit var btnClear: Button
-    private lateinit var btnExport: Button
-    private lateinit var sbStrokeWidth: SeekBar
-    private lateinit var btnUndo: Button
-    private lateinit var btnRedo: Button
+    private lateinit var viewBinding: ActivityMainBinding
 
     @SuppressLint("WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewBinding = ActivityMainBinding.inflate(layoutInflater)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
-        drawingView = findViewById<DrawingView>(R.id.drawingView)
-        bitmapFileManager = BitmapFileManager(
-            saveStrategy = BitmapRoomImpl(this),
-            loadStrategy = FileDraftImpl(this),
-            exportStrategy = MediaBitmapExportImpl(this),
-        )
+        setContentView(viewBinding.root)
+
         loadDraw()
-        drawingView.onSaveBitmapListener = {
+        viewBinding.drawingView.onSaveBitmapListener = {
             save()
         }
-        btnBrush = findViewById(R.id.btnBrush)
-        btnErase = findViewById(R.id.btnEarse)
-        btnPreview = findViewById(R.id.btnPreview)
-        btnClear = findViewById(R.id.btnClear)
-        btnExport = findViewById(R.id.btnExport)
-        sbStrokeWidth = findViewById(R.id.sbStrokeWidth)
-        btnUndo = findViewById(R.id.btnUndo)
-        btnRedo = findViewById(R.id.btnRedo)
-        btnBrush.setOnClickListener(this)
-        btnErase.setOnClickListener(this)
-        btnPreview.setOnClickListener(this)
-        btnClear.setOnClickListener(this)
-        btnExport.setOnClickListener(this)
-        btnUndo.setOnClickListener(this)
-        btnRedo.setOnClickListener(this)
-        findViewById<Button>(R.id.btnColorBlack).setOnClickListener(this)
-        findViewById<Button>(R.id.btnColorBlue).setOnClickListener(this)
-        val textView = findViewById<TextView>(R.id.tvStrokeWidth)
-        val testErase = findViewById<TextView>(R.id.tvEraseWidth)
-
-        findViewById<SeekBar>(R.id.sbStrokeWidth).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        with(viewBinding) {
+            btnBrush.setOnClickListener(this@MainActivity)
+            btnEarse.setOnClickListener(this@MainActivity)
+            btnPreview.setOnClickListener(this@MainActivity)
+            btnClear.setOnClickListener(this@MainActivity)
+            btnExport.setOnClickListener(this@MainActivity)
+            btnUndo.setOnClickListener(this@MainActivity)
+            btnRedo.setOnClickListener(this@MainActivity)
+            btnColorBlack.setOnClickListener(this@MainActivity)
+            btnColorBlue.setOnClickListener(this@MainActivity)
+        }
+        viewBinding.sbStrokeWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar?,
                 progress: Int,
                 fromUser: Boolean
             ) {
                 viewModel.setBrushSize(progress.toFloat())
-                textView.text = progress.toString()
+                viewBinding.tvStrokeWidth.text = progress.toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -91,14 +74,14 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
 
         })
 
-        findViewById<SeekBar>(R.id.sbEraseWidth).setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        viewBinding.sbEraseWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
                 seekBar: SeekBar?,
                 progress: Int,
                 fromUser: Boolean
             ) {
                 viewModel.setEraseSize(progress.toFloat())
-                testErase.text = progress.toString()
+                viewBinding.tvEraseWidth.text = progress.toString()
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -106,7 +89,7 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 
         })
-        
+
         observeViewModel()
     }
 
@@ -114,7 +97,7 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    drawingView.updateConfig(
+                    viewBinding.drawingView.updateConfig(
                         state.drawingTool,
                         state.color,
                         state.brushSize,
@@ -123,10 +106,10 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
 
                     val isReview = state.drawingTool == DrawingTool.REVIEW
 
-                    btnPreview.isSelected = isReview
-                    btnBrush.isSelected =
+                    viewBinding.btnPreview.isSelected = isReview
+                    viewBinding.btnBrush.isSelected =
                         !isReview && state.drawingTool == DrawingTool.BRUSH
-                    btnErase.isSelected =
+                    viewBinding.btnEarse.isSelected =
                         !isReview && state.drawingTool == DrawingTool.ERASE
 
                 }
@@ -137,44 +120,44 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
     }
 
     private fun save() {
-        val bp = drawingView.getBitmap()
-        viewModel.save(bp, drawingView.transformMatrix)
+        val bp = viewBinding.drawingView.getBitmap()
+        viewModel.save(bp, viewBinding.drawingView.transformMatrix)
     }
 
     private fun loadDraw() {
         val pair = viewModel.loadDraw() ?: return
-        drawingView.setBitmap(pair.first)
-        drawingView.transformMatrix.set(pair.second)
+        viewBinding.drawingView.setBitmap(pair.first)
+        viewBinding.drawingView.transformMatrix.set(pair.second)
     }
 
     override fun onClick(v: View?) {
-        when(v?.id) {
-            R.id.btnEarse -> {
+        with(viewBinding) {
+            btnEarse.setOnClickListener {
                 viewModel.setDrawingTool(DrawingTool.ERASE)
             }
-            R.id.btnBrush -> {
+            btnBrush.setOnClickListener {
                 viewModel.setDrawingTool(DrawingTool.BRUSH)
             }
-            R.id.btnClear -> {
-                lifecycleScope.launch { drawingView.clear() }
+            btnClear.setOnClickListener {
+                lifecycleScope.launch { viewBinding.drawingView.clear() }
             }
-            R.id.btnExport -> {
-                viewModel.exportBitmap(drawingView.getBitmap())
+            btnExport.setOnClickListener {
+                viewModel.exportBitmap(viewBinding.drawingView.getBitmap())
             }
-            R.id.btnPreview -> {
+            btnPreview.setOnClickListener{
                 viewModel.setDrawingTool(DrawingTool.REVIEW)
             }
-            R.id.btnColorBlack -> {
+            btnColorBlack.setOnClickListener {
                 viewModel.setBrushColor(Color.BLACK)
             }
-            R.id.btnColorBlue -> {
+            btnColorBlue.setOnClickListener {
                 viewModel.setBrushColor(Color.BLUE)
             }
-            R.id.btnUndo -> {
-                drawingView.undo()
+            btnUndo.setOnClickListener {
+                viewBinding.drawingView.undo()
             }
-            R.id.btnRedo -> {
-                drawingView.redo()
+            btnRedo.setOnClickListener {
+                viewBinding.drawingView.redo()
             }
         }
     }
