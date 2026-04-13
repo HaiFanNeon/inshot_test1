@@ -34,6 +34,7 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
         DrawingViewModelFactory(bitmapFileManager)
     }
 
+
     private lateinit var viewBinding: ActivityMainBinding
 
     @SuppressLint("WrongViewCast", "MissingInflatedId")
