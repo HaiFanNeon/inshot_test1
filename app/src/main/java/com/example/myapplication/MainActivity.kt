@@ -24,7 +24,7 @@ import com.example.myapplication.viewModel.DrawingViewModel
 import kotlinx.coroutines.launch
 
 
-class MainActivity : ComponentActivity(), View.OnClickListener{
+class MainActivity : ComponentActivity(){
     private var bitmapFileManager: BitmapFileManager = BitmapFileManager(
         saveStrategy = BitmapRoomImpl(this),
         loadStrategy = FileDraftImpl(this),
@@ -47,17 +47,6 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
         loadDraw()
         viewBinding.drawingView.onSaveBitmapListener = {
             save()
-        }
-        with(viewBinding) {
-            btnBrush.setOnClickListener(this@MainActivity)
-            btnEarse.setOnClickListener(this@MainActivity)
-            btnPreview.setOnClickListener(this@MainActivity)
-            btnClear.setOnClickListener(this@MainActivity)
-            btnExport.setOnClickListener(this@MainActivity)
-            btnUndo.setOnClickListener(this@MainActivity)
-            btnRedo.setOnClickListener(this@MainActivity)
-            btnColorBlack.setOnClickListener(this@MainActivity)
-            btnColorBlue.setOnClickListener(this@MainActivity)
         }
         viewBinding.sbStrokeWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
@@ -90,6 +79,36 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
 
         })
+
+        with(viewBinding) {
+            btnEarse.setOnClickListener {
+                viewModel.setDrawingTool(DrawingTool.ERASE)
+            }
+            btnBrush.setOnClickListener {
+                viewModel.setDrawingTool(DrawingTool.BRUSH)
+            }
+            btnClear.setOnClickListener {
+                lifecycleScope.launch { viewBinding.drawingView.clear() }
+            }
+            btnExport.setOnClickListener {
+                viewModel.exportBitmap(viewBinding.drawingView.getBitmap())
+            }
+            btnPreview.setOnClickListener{
+                viewModel.setDrawingTool(DrawingTool.REVIEW)
+            }
+            btnColorBlack.setOnClickListener {
+                viewModel.setBrushColor(Color.BLACK)
+            }
+            btnColorBlue.setOnClickListener {
+                viewModel.setBrushColor(Color.BLUE)
+            }
+            btnUndo.setOnClickListener {
+                viewBinding.drawingView.undo()
+            }
+            btnRedo.setOnClickListener {
+                viewBinding.drawingView.redo()
+            }
+        }
 
         observeViewModel()
     }
@@ -131,35 +150,4 @@ class MainActivity : ComponentActivity(), View.OnClickListener{
         viewBinding.drawingView.transformMatrix.set(pair.second)
     }
 
-    override fun onClick(v: View?) {
-        with(viewBinding) {
-            btnEarse.setOnClickListener {
-                viewModel.setDrawingTool(DrawingTool.ERASE)
-            }
-            btnBrush.setOnClickListener {
-                viewModel.setDrawingTool(DrawingTool.BRUSH)
-            }
-            btnClear.setOnClickListener {
-                lifecycleScope.launch { viewBinding.drawingView.clear() }
-            }
-            btnExport.setOnClickListener {
-                viewModel.exportBitmap(viewBinding.drawingView.getBitmap())
-            }
-            btnPreview.setOnClickListener{
-                viewModel.setDrawingTool(DrawingTool.REVIEW)
-            }
-            btnColorBlack.setOnClickListener {
-                viewModel.setBrushColor(Color.BLACK)
-            }
-            btnColorBlue.setOnClickListener {
-                viewModel.setBrushColor(Color.BLUE)
-            }
-            btnUndo.setOnClickListener {
-                viewBinding.drawingView.undo()
-            }
-            btnRedo.setOnClickListener {
-                viewBinding.drawingView.redo()
-            }
-        }
-    }
 }

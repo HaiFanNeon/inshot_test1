@@ -37,10 +37,8 @@ class DrawingView @JvmOverloads constructor(
     private var initialDistance = 0f
     private var initialRotation = 0f
     private var currentBrush: BaseBrush? = null
-
     private val undoStk: ArrayDeque<PathActionImpl> = ArrayDeque()
     private val redoStk: ArrayDeque<PathActionImpl> = ArrayDeque()
-
     private var baseBitmap: Bitmap? = null
 
     init {
@@ -146,8 +144,11 @@ class DrawingView @JvmOverloads constructor(
     }
 
     fun updateConfig(tool: DrawingTool, color: Int, stroke: Float, eraseSize: Float) {
-        currentTool = tool
-        currentBrush = BrushFactory.create(tool, color, stroke, eraseSize)
+        if (tool == currentTool) {
+            currentBrush = BrushFactory.create(tool, color, stroke, eraseSize)
+        } else {
+            currentBrush?.updateConfig(color, stroke)
+        }
         invalidate()
     }
 
@@ -258,7 +259,7 @@ class DrawingView @JvmOverloads constructor(
                     }
                     var angleDiff = newRotation - initialRotation
                     if (angleDiff > 180) angleDiff -= 360
-                    if (angleDiff < 180) angleDiff += 360
+                    if (angleDiff < -180) angleDiff += 360
                     transformMatrix.postRotate(angleDiff, midX, midY)
                     initialRotation = newRotation
                     initialDistance = newDistance
